@@ -29,7 +29,13 @@ namespace TemperatureMonitor
                     };
                     points.Add(p);
             }
-            drawable.Source = points;
+            CurveData d = new CurveData()
+            {
+                curveColor = Colors.Red,
+                Source = points
+            };
+            drawable.data.Clear();
+            drawable.data.Add(d);
             drawable.voffset = 18;
             drawable.vscale_level = 2;
             drawable.hscale_level = 0;

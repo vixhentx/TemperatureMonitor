@@ -1,4 +1,5 @@
-﻿using Microsoft.Maui.Graphics;
+﻿using Microsoft.Maui.Controls;
+using Microsoft.Maui.Graphics;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,57 +13,34 @@ namespace TemperatureMonitor.Graphics
     //缩放控制和画曲线的函数分开
     public class CurveDrawable : IDrawable
     {
-        protected List<CurvePoint> _source = new List<CurvePoint>();  
-        public List<CurvePoint> Source
-        {
-            get { return _source; }
-            set
-            {
-                _source = value;
-                prefix_sum.Clear();
-                prefix_sum.Add(0);
-                for(int i=0; i < _source.Count ; i++)
-                {
-                    prefix_sum.Add(prefix_sum[prefix_sum.Count - 1] + _source[i].tempPos);
-                }
-            }
-        }
 
-        List<double> prefix_sum = new List<double>();
+        public List<CurveData> data = new List<CurveData>();
 
-        const int vaxis_width=80, haxis_height=50;
+        const int vaxis_width = 80, haxis_height = 50;
         static float[] vscale_base = { 0.1F, 0.5F, 1, 5, 10, 20 };//一格多少度
         static float[] hscale_base = { 1, 10, 30, 60, 600, 1800, 3600 };//一格多秒
-        const float max_cell_height = 0.3f, max_cell_width = 0.3f, min_cell_height= 0.05f, min_cell_width= 0.05f;
-        const float cell_height_base=0.1f,cell_width_base=0.1f;
+        const float max_cell_height = 0.3f, max_cell_width = 0.3f, min_cell_height = 0.05f, min_cell_width = 0.05f;
+        const float cell_height_base = 0.1f, cell_width_base = 0.1f;
         const float ymax = 120, ymin = -30;
 
-        public int vscale_level=4, hscale_level=0;
-        public float vzoom_factor=1.0f, hzoom_factor=1.0f;
-        public float hoffset=0.0f, voffset=0.0f;//偏移量，单位：方格 
-        const float reserved_area_for_curve = 30, reserved_area_for_vscale = 10 , reserved_area_for_hscale = 15;
+        public int vscale_level = 4, hscale_level = 0;
+        public float vzoom_factor = 1.0f, hzoom_factor = 1.0f;
+        public float hoffset = 0.0f, voffset = 0.0f;//偏移量，单位：方格 
+        const float reserved_area_for_curve = 30, reserved_area_for_vscale = 10, reserved_area_for_hscale = 15;
 
         static float[] stroke_dash_pattern = { 2, 2 };
         const string temperatur_unit = "℃";
         public DateTime start_time;//hoffset=0代表的时间 
 
-        
-        public void AddPoint(CurvePoint point)
-        {
-            prefix_sum.Add(prefix_sum[prefix_sum.Count - 1] + point.tempPos);
-            _source.Add(point);
-        }
-        private float GetAverage(int l_index,int r_index)
-        {
-            return (float)((prefix_sum[r_index+1]-prefix_sum[l_index])/(r_index-l_index+1));
-        }
+
+
         protected int GetScaleLevel(float span, float cell_length, float[] scale)
         {
             int l = 0, r = scale.Count(), mid;
             while (l < r)
             {
                 mid = (l + r) / 2;
-                if (cell_length >= scale[mid] / span) 
+                if (cell_length >= scale[mid] / span)
                 {
                     l = mid + 1;
                 }
@@ -75,25 +53,30 @@ namespace TemperatureMonitor.Graphics
         }
         public void Draw(ICanvas canvas, RectF dirtyRect)
         {
+            //检查参数
+            hoffset = Math.Clamp(hoffset, 0, maxCount - nspan);
+            voffset = Math.Clamp(voffset, ymin, ymax);
 
+            DrawAxis(canvas, dirtyRect);
+            foreach(var d in data)
+            {
+                if(d.visable)
+                {
+                    DrawCurve(d,canvas,dirtyRect);
+                }
+            }
+        }
+        void DrawAxis(ICanvas canvas, RectF dirtyRect)
+        {
             float width = dirtyRect.Width, height = dirtyRect.Height;
             float bottom = dirtyRect.Bottom - reserved_area_for_curve, top = dirtyRect.Top + reserved_area_for_curve;
             float left = dirtyRect.Left + vaxis_width, right = dirtyRect.Right - reserved_area_for_curve;
 
             //时间轴
-            float cell_width = cell_width_base * hzoom_factor, hscale = hscale_base[hscale_level];
-            int nspan = int.Min((int)float.Floor(hscale / cell_width) + 1, _source.Count);
-            int hcount = int.Min((int)float.Floor(1 / cell_width) + 1, (int)float.Floor( _source.Count / hscale ) );
-
-            //温度轴
-            float cell_height = cell_height_base * vzoom_factor, vscale = vscale_base[vscale_level];
-            int mspan = (int)float.Floor(1 / cell_height);
+            int hcount = int.Min((int)float.Floor(1 / cell_width) + 1, (int)float.Floor(maxCount / hscale));
 
             float xbegin = left, ybegin = bottom;
 
-            //检查参数
-            hoffset = Math.Clamp(hoffset, 0, _source.Count - nspan );
-            voffset = Math.Clamp(voffset, ymin, ymax);
 
             /*画轴*/
             //画虚线
@@ -102,7 +85,7 @@ namespace TemperatureMonitor.Graphics
             canvas.StrokeDashPattern = stroke_dash_pattern;
             for (int i = 0; i < mspan; i++)
             {
-                float y = ybegin - i * cell_height  * height;//voffset处是最底端
+                float y = ybegin - i * cell_height * height;//voffset处是最底端
                 canvas.DrawLine(reserved_area_for_vscale, y, right, y);
             }
 
@@ -113,19 +96,30 @@ namespace TemperatureMonitor.Graphics
             //垂直
             for (int i = 0; i < mspan; i++)
             {
-                float y = ybegin -  i  * cell_height * height;
-                canvas.DrawString( (voffset + i * vscale).ToString("0.0") + temperatur_unit, reserved_area_for_vscale, y, HorizontalAlignment.Left);
+                float y = ybegin - i * cell_height * height;
+                canvas.DrawString((voffset + i * vscale).ToString("0.0") + temperatur_unit, reserved_area_for_vscale, y, HorizontalAlignment.Left);
             }
             //下标刻度
             canvas.StrokeDashPattern = null;
             canvas.StrokeSize = 5;
-            for (int i = 0; i< hcount; i++)
+            for (int i = 0; i < hcount; i++)
             {
                 float x = xbegin + (i - (hoffset / hscale - float.Floor(hoffset / hscale))) * cell_width * width;
                 float y = ybegin + reserved_area_for_hscale;
                 string s = (start_time.AddSeconds((int)hoffset + ((int)hscale * (2 * i + 1) - 1) / 2)).ToString("HH:mm:ss");
                 canvas.DrawString(s, x, y, HorizontalAlignment.Center);
             }
+        }
+        void DrawCurve(CurveData d, ICanvas canvas, RectF dirtyRect)
+        {
+
+            float width = dirtyRect.Width, height = dirtyRect.Height;
+            float bottom = dirtyRect.Bottom - reserved_area_for_curve, top = dirtyRect.Top + reserved_area_for_curve;
+            float left = dirtyRect.Left + vaxis_width, right = dirtyRect.Right - reserved_area_for_curve;
+
+            int hcount = int.Min((int)float.Floor(1 / cell_width) + 1, (int)float.Floor(d.Source.Count / hscale));
+
+            float xbegin = left, ybegin = bottom;
 
 
             /*画线*/
@@ -135,10 +129,10 @@ namespace TemperatureMonitor.Graphics
             for (int i = 0; i < hcount; i++)
             {
                 int l = (int)float.Floor(hoffset) + (int)hscale * i, r = (int)float.Floor(hoffset) + (int)hscale * (i + 1) - 1;
-                points[i].X = xbegin + (i - ( hoffset / hscale - float.Floor(hoffset / hscale)) ) * cell_width * width;
-                points[i].Y = ybegin - ( GetAverage( l , r ) - voffset ) / vscale * cell_height * height;
-            }   
-            
+                points[i].X = xbegin + (i - (hoffset / hscale - float.Floor(hoffset / hscale))) * cell_width * width;
+                points[i].Y = ybegin - (d.GetAverage(l, r) - voffset) / vscale * cell_height * height;
+            }
+
 
             //曲线区域
             //创建折现轨迹
@@ -151,36 +145,27 @@ namespace TemperatureMonitor.Graphics
             //画折现轨迹
             canvas.StrokeDashPattern = null;
             canvas.StrokeSize = 10;
-            canvas.StrokeColor = Colors.Red;
+            canvas.StrokeColor = d.curveColor;
             canvas.StrokeLineJoin = LineJoin.Round;
             canvas.DrawPath(path);
-             /*
-            //打点，防止只有一个数据点不显示f
-            canvas.StrokeColor=Colors.Yellow;
-            canvas.StrokeSize = 1;
-            for(int i=0 ; i< nspan ; i++)
-            {
-                canvas.FillCircle(points[i], 1);
-            }
-             */
-            
+
         }
         public void Auto()
         {
-            
+
         }
         public void OnChangeCellHeight(float vPercentage)
         {
             float min, max;
-            if (vscale_level>0)
+            if (vscale_level > 0)
             {
-                min = vscale_base[vscale_level-1]/vscale_base[vscale_level];
+                min = vscale_base[vscale_level - 1] / vscale_base[vscale_level];
             }
             else
             {
                 min = vscale_base[vscale_level];
             }
-            if(vscale_level<vscale_base.Length-1)
+            if (vscale_level < vscale_base.Length - 1)
             {
                 max = vscale_base[vscale_level + 1] / vscale_base[vscale_level];
             }
@@ -188,7 +173,7 @@ namespace TemperatureMonitor.Graphics
             {
                 max = vscale_base[vscale_level];
             }
-            vzoom_factor = min + vPercentage*(max-min);
+            vzoom_factor = min + vPercentage * (max - min);
         }
         public float GetCellHeightPercent(float vzf)
         {
@@ -209,7 +194,7 @@ namespace TemperatureMonitor.Graphics
             {
                 max = vscale_base[vscale_level];
             }
-            return (vzf - min)/(max-min); 
+            return (vzf - min) / (max - min);
         }
         public void OnChangeCellWidth(float hPercentage)
         {
@@ -260,10 +245,10 @@ namespace TemperatureMonitor.Graphics
 
             float cell_width = cell_width_base * hzoom_factor, hscale = hscale_base[hscale_level];
             float cell_height = cell_height_base * vzoom_factor, vscale = vscale_base[vscale_level];
-            if (vscale_level <= vscale_base[vscale_base.Count() - 1]) 
+            if (vscale_level <= vscale_base[vscale_base.Count() - 1])
             {
                 float new_vscale = vscale_base[vscale_level + 1];
-                if(cell_height * vscale > min_cell_height * new_vscale)
+                if (cell_height * vscale > min_cell_height * new_vscale)
                 {
                     vscale_level++;
                     cell_height *= vscale * new_vscale;
@@ -283,7 +268,31 @@ namespace TemperatureMonitor.Graphics
         {
 
         }
+
+
         public int max_hscale_level { get { return hscale_base.Length - 1; } }
-        public int max_vscale_level { get { return vscale_base.Length-1;} }
+        public int max_vscale_level { get { return vscale_base.Length - 1; } }
+        public int maxCount
+        {
+            get
+            {
+                int ans = -1;
+                foreach (var v in data)
+                {
+                    if (v.Source.Count > ans)
+                    {
+                        ans = v.Source.Count;
+                    }
+                }
+                return ans;
+            }
+        }
+        float hscale { get { return hscale_base[hscale_level]; } }
+        float vscale { get { return vscale_base[vscale_level]; } }
+        float cell_height { get { return cell_height_base * vzoom_factor; } }
+        float cell_width { get { return cell_width_base * hzoom_factor; } }
+
+        int nspan { get { return int.Min((int)float.Floor(hscale / cell_width) + 1, maxCount); } }
+        int mspan { get { return (int)float.Floor(1 / cell_height); } }
     }
 }
