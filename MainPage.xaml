@@ -1,0 +1,44 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:graphics="clr-namespace:TemperatureMonitor.Graphics"
+             x:Class="TemperatureMonitor.MainPage"
+             Title="">
+
+    <ContentPage.Resources>
+        <graphics:CurveDrawable x:Key="curve_drawable"/>
+    </ContentPage.Resources>
+    <Grid>
+        <HorizontalStackLayout HorizontalOptions="Start" VerticalOptions="Start" HeightRequest="80" Margin="0,5,5,0">
+            <Grid x:Name= "hPanel" WidthRequest="200" VerticalOptions="Start" Margin="5">
+                <Grid.GestureRecognizers>
+                    <TapGestureRecognizer NumberOfTapsRequired="2" Tapped="hPannel_Reset"/>
+                </Grid.GestureRecognizers>
+                <Slider x:Name="hscaleSlider" WidthRequest="100" Minimum="0" Maximum="1" VerticalOptions="Center" HorizontalOptions="Center" Margin="0,10,0,0" ValueChanged="hscaleSlider_ValueChanged"/>
+                <Button x:Name="hscaleMinusButton" Text="-" WidthRequest="30" HeightRequest="40" BorderWidth="0" Padding="0" CornerRadius="20" VerticalOptions="Center" HorizontalOptions="Start" Clicked="hscaleMinusButton_Clicked"/>
+                <Button x:Name="hscalePlusButton" Text="+" WidthRequest="30" HeightRequest="40" BorderWidth="0" Padding="0" CornerRadius="20" VerticalOptions="Center" HorizontalOptions="End" Clicked="hscalePlusButton_Clicked"/>
+                <Label Text="水平缩放" HorizontalOptions="Center" VerticalOptions="End"  Margin="0,0,0,-25"/>
+            </Grid>
+            <Grid x:Name="vPanel" WidthRequest="200" VerticalOptions="Start" Margin="5">
+                <Grid.GestureRecognizers>
+                    <TapGestureRecognizer NumberOfTapsRequired="2" Tapped="vPannel_Reset"/>
+                </Grid.GestureRecognizers>
+                <Slider x:Name="vscaleSlider" WidthRequest="100" Minimum="0" Maximum="1" VerticalOptions="Center" HorizontalOptions="Center" Margin="0,10,0,0" ValueChanged="vscaleSlider_ValueChanged"/>
+                <Button x:Name="vscaleMinusButton" Text="-" WidthRequest="30" HeightRequest="40" BorderWidth="0" Padding="0" CornerRadius="20" VerticalOptions="Center" HorizontalOptions="Start" Clicked="vscaleMinusButton_Clicked"/>
+                <Button x:Name="vscalePlusButton" Text="+" WidthRequest="30" HeightRequest="40" BorderWidth="0" Padding="0" CornerRadius="20" VerticalOptions="Center" HorizontalOptions="End" Clicked="vscalePlusButton_Clicked"/>
+                <Label Text="垂直缩放" HorizontalOptions="Center" VerticalOptions="End"  Margin="0,0,0,-25"/>
+            </Grid>
+        </HorizontalStackLayout>
+        <HorizontalStackLayout HorizontalOptions="End" VerticalOptions="Start" HeightRequest="80" Margin="0,5,5,0" >
+            <Button x:Name="startButton" Text="A" WidthRequest="50" HeightRequest="50" Margin="5,0"/>
+            <Button x:Name="autoButton" Text="S" WidthRequest="50" HeightRequest="50" Margin="5,0"/>
+        </HorizontalStackLayout>
+        <GraphicsView x:Name="curveView" Drawable="{StaticResource curve_drawable}" Margin="10,85,10,55" HorizontalOptions="Fill" VerticalOptions="Fill" >
+            <GraphicsView.GestureRecognizers>
+                <PanGestureRecognizer PanUpdated="PanGestureRecognizer_PanUpdated"/>
+            </GraphicsView.GestureRecognizers>
+        </GraphicsView>
+        <Button x:Name="testButton" VerticalOptions="End" Clicked="testButton_Clicked"/>
+    </Grid>
+
+</ContentPage>
