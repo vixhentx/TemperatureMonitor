@@ -25,12 +25,12 @@ namespace TemperatureMonitor.Graphics
 
         public int vscale_level = 4, hscale_level = 0;
         public float vzoom_factor = 1.0f, hzoom_factor = 1.0f;
-        public float hoffset = 0.0f, voffset = 0.0f;//偏移量，单位：方格 
+        public DateTime hoffset = DateTime.Now;
+        public float voffset = 0.0f;
         const float reserved_area_for_curve = 30, reserved_area_for_vscale = 10, reserved_area_for_hscale = 15;
 
         static float[] stroke_dash_pattern = { 2, 2 };
         const string temperatur_unit = "℃";
-        public DateTime start_time;//hoffset=0代表的时间 
 
 
 
@@ -53,7 +53,7 @@ namespace TemperatureMonitor.Graphics
         }
         void Check()
         {
-            hoffset = Math.Clamp(hoffset, 0, maxCount - nspan);
+            if (hoffset.AddSeconds(hcount) > DateTime.Now) hoffset = DateTime.Now.AddSeconds(-hcount);
             voffset = Math.Clamp(voffset, ymin, ymax);
             hscale_level = Math.Clamp(hscale_level,0,max_hscale_level);
             vscale_level = Math.Clamp(vscale_level,0,max_vscale_level);
@@ -106,9 +106,9 @@ namespace TemperatureMonitor.Graphics
             canvas.StrokeSize = 5;
             for (int i = 0; i < hcount; i++)
             {
-                float x = xbegin + (i - (hoffset / hscale - float.Floor(hoffset / hscale))) * cell_width * width;
+                float x = xbegin + (i - hoffset.Millisecond / 1000f / hscale) * cell_width * width;
                 float y = ybegin + reserved_area_for_hscale;
-                string s = (start_time.AddSeconds((int)hoffset + ((int)hscale * (2 * i + 1) - 1) / 2)).ToString("HH:mm:ss");
+                string s = (hoffset.AddSeconds(((int)hscale * (2 * i + 1) - 1) / 2)).ToString("HH:mm:ss");
                 canvas.DrawString(s, x, y, HorizontalAlignment.Center);
             }
         }
@@ -128,9 +128,8 @@ namespace TemperatureMonitor.Graphics
 
             for (int i = 0; i < hcount; i++)
             {
-                int l = (int)float.Floor(hoffset) + (int)hscale * i, r = (int)float.Floor(hoffset) + (int)hscale * (i + 1) - 1;
-                points[i].X = xbegin + (i - (hoffset / hscale - float.Floor(hoffset / hscale))) * cell_width * width;
-                points[i].Y = ybegin - (d.GetAverage(l, r) - voffset) / vscale * cell_height * height;
+                points[i].X = xbegin + (i - hoffset.Millisecond / 1000f / hscale)  * cell_width * width;
+                points[i].Y = ybegin - (d[hoffset.AddSeconds((i * hscale) - hoffset.Millisecond / 1000f), hoffset.AddSeconds(((i+1) * hscale) - hoffset.Millisecond / 1000f)] - voffset) / vscale * cell_height * height;
             }
 
 
@@ -157,9 +156,7 @@ namespace TemperatureMonitor.Graphics
             {
                 for (int i = 0; i < hcount; i++)
                 {
-                    int l = (int)float.Floor(hoffset) + (int)hscale * i, r = (int)float.Floor(hoffset) + (int)hscale * (i + 1) - 1;
-                    if (l >= d.Source.Count || r >= d.Source.Count) continue;
-                    var v = d.GetAverage(l, r);
+                    var v = d[hoffset.AddSeconds((int)hscale * i),hoffset.AddSeconds((int)hscale * (i+1) )];
                     if (v < min) min = v;
                     if (v > max) max = v;
                 }
@@ -170,6 +167,10 @@ namespace TemperatureMonitor.Graphics
             Check();
             voffset = min - 0.5f * cell_height * vscale;
 
+        }
+        public void Track()
+        {
+            hoffset = DateTime.Now.AddSeconds(-nspan);
         }
         public void OnChangeCellHeight(float vPercentage)
         {
@@ -277,7 +278,7 @@ namespace TemperatureMonitor.Graphics
             float cell_width = cell_width_base * hzoom_factor;
             float cell_height = cell_height_base * vzoom_factor;
 
-            hoffset -= panX_Percentage / cell_width * hscale;
+            hoffset=hoffset.AddSeconds( - panX_Percentage / cell_width * hscale);
             voffset += panY_Percentage / cell_height * vscale;
         }
 
@@ -296,9 +297,9 @@ namespace TemperatureMonitor.Graphics
                 int ans = -1;
                 foreach (var v in data)
                 {
-                    if (v.Source.Count > ans)
+                    if (v.Count > ans)
                     {
-                        ans = v.Source.Count;
+                        ans = v.Count;
                     }
                 }
                 return ans;

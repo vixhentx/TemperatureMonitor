@@ -19,7 +19,7 @@ namespace TemperatureMonitor
             if (drawable == null) return;
             List<CurvePoint> points = new List<CurvePoint>();
             CurvePoint p;
-            DateTime dt= DateTime.Now;
+            DateTime dt= DateTime.Now.AddSeconds(-20);
             for (int i = 0; i < 20; i++)
             {
                     p = new CurvePoint
@@ -29,17 +29,37 @@ namespace TemperatureMonitor
                     };
                     points.Add(p);
             }
-            CurveData d = new CurveData()
+            CurveData d = new CurveData
             {
                 curveColor = Colors.Red,
                 Source = points
             };
             drawable.data.Clear();
             drawable.data.Add(d);
+
+            dt= DateTime.Now.AddSeconds(-20);
+            points.Clear();
+            for (int i = 0; i < 20; i++) 
+            {
+                p = new CurvePoint
+                {
+                    timePos = dt.AddSeconds(i),
+                    tempPos = 5 + rand.Next(100) / 100f + 18 + 0.5f * i
+                };
+                points.Add(p);
+            }
+            d = new CurveData
+            {
+                curveColor = Colors.Blue,
+                Source = points
+            };
+
+            drawable.data.Add(d);
+
             drawable.voffset = 18;
             drawable.vscale_level = 2;
             drawable.hscale_level = 0;
-            drawable.start_time = dt;
+            drawable.hoffset = dt;
             curveView.Invalidate();
         }
 
@@ -111,6 +131,11 @@ namespace TemperatureMonitor
             curveView.Invalidate();
         }
 
+
+        private void startButton_Clicked(object sender, EventArgs e)
+        {
+
+        }
         private void autoButton_Clicked(object sender, EventArgs e)
         {
             CurveDrawable s = (CurveDrawable)curveView.Drawable;
@@ -119,9 +144,16 @@ namespace TemperatureMonitor
             curveView.Invalidate();
         }
 
-        private void startButton_Clicked(object sender, EventArgs e)
+        bool is_track = false;
+        private void trackButton_Clicked(object sender, EventArgs e)
         {
-
+            is_track = !is_track;
+            if(is_track)
+            {
+                CurveDrawable s = (CurveDrawable)curveView.Drawable;
+                s.Track();
+                curveView.Invalidate();
+            }
         }
 
         private void hscaleSlider_ValueChanged(object sender, ValueChangedEventArgs e)
