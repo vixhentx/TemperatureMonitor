@@ -30,8 +30,8 @@
             </Grid>
         </HorizontalStackLayout>
         <HorizontalStackLayout HorizontalOptions="End" VerticalOptions="Start" HeightRequest="80" Margin="0,5,5,0" >
-            <Button x:Name="startButton" Text="A" WidthRequest="50" HeightRequest="50" Margin="5,0"/>
-            <Button x:Name="autoButton" Text="S" WidthRequest="50" HeightRequest="50" Margin="5,0"/>
+            <Button x:Name="autoButton" Text="A" WidthRequest="50" HeightRequest="50" Margin="5,0" Clicked="autoButton_Clicked"/>
+            <Button x:Name="startButton" Text="S" WidthRequest="50" HeightRequest="50" Margin="5,0" Clicked="startButton_Clicked"/>
         </HorizontalStackLayout>
         <GraphicsView x:Name="curveView" Drawable="{StaticResource curve_drawable}" Margin="10,85,10,55" HorizontalOptions="Fill" VerticalOptions="Fill" >
             <GraphicsView.GestureRecognizers>

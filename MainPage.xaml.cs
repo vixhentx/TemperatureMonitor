@@ -111,6 +111,19 @@ namespace TemperatureMonitor
             curveView.Invalidate();
         }
 
+        private void autoButton_Clicked(object sender, EventArgs e)
+        {
+            CurveDrawable s = (CurveDrawable)curveView.Drawable;
+            s.Auto();
+            vscaleSlider.Value = s.GetCellHeightPercent(s.vzoom_factor);
+            curveView.Invalidate();
+        }
+
+        private void startButton_Clicked(object sender, EventArgs e)
+        {
+
+        }
+
         private void hscaleSlider_ValueChanged(object sender, ValueChangedEventArgs e)
         {
             CurveDrawable s = (CurveDrawable)curveView.Drawable;

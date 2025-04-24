@@ -51,11 +51,16 @@ namespace TemperatureMonitor.Graphics
             }
             return r;
         }
-        public void Draw(ICanvas canvas, RectF dirtyRect)
+        void Check()
         {
-            //检查参数
             hoffset = Math.Clamp(hoffset, 0, maxCount - nspan);
             voffset = Math.Clamp(voffset, ymin, ymax);
+            hscale_level = Math.Clamp(hscale_level,0,max_hscale_level);
+            vscale_level = Math.Clamp(vscale_level,0,max_vscale_level);
+        }
+        public void Draw(ICanvas canvas, RectF dirtyRect)
+        {
+            Check();
 
             DrawAxis(canvas, dirtyRect);
             foreach(var d in data)
@@ -71,9 +76,6 @@ namespace TemperatureMonitor.Graphics
             float width = dirtyRect.Width, height = dirtyRect.Height;
             float bottom = dirtyRect.Bottom - reserved_area_for_curve, top = dirtyRect.Top + reserved_area_for_curve;
             float left = dirtyRect.Left + vaxis_width, right = dirtyRect.Right - reserved_area_for_curve;
-
-            //时间轴
-            int hcount = int.Min((int)float.Floor(1 / cell_width) + 1, (int)float.Floor(maxCount / hscale));
 
             float xbegin = left, ybegin = bottom;
 
@@ -117,8 +119,6 @@ namespace TemperatureMonitor.Graphics
             float bottom = dirtyRect.Bottom - reserved_area_for_curve, top = dirtyRect.Top + reserved_area_for_curve;
             float left = dirtyRect.Left + vaxis_width, right = dirtyRect.Right - reserved_area_for_curve;
 
-            int hcount = int.Min((int)float.Floor(1 / cell_width) + 1, (int)float.Floor(d.Source.Count / hscale));
-
             float xbegin = left, ybegin = bottom;
 
 
@@ -152,6 +152,23 @@ namespace TemperatureMonitor.Graphics
         }
         public void Auto()
         {
+            float min=ymax, max=ymin;
+            foreach (var d in data)
+            {
+                for (int i = 0; i < hcount; i++)
+                {
+                    int l = (int)float.Floor(hoffset) + (int)hscale * i, r = (int)float.Floor(hoffset) + (int)hscale * (i + 1) - 1;
+                    if (l >= d.Source.Count || r >= d.Source.Count) continue;
+                    var v = d.GetAverage(l, r);
+                    if (v < min) min = v;
+                    if (v > max) max = v;
+                }
+            }
+
+            vscale_level = GetScaleLevel(max - min, 0.1f, vscale_base);
+            vzoom_factor = (vscale) / (cell_height_base * (max - min));
+            Check();
+            voffset = min - 0.5f * cell_height * vscale;
 
         }
         public void OnChangeCellHeight(float vPercentage)
@@ -243,8 +260,8 @@ namespace TemperatureMonitor.Graphics
             hzoom_factor += zoomX_Percentage;
             vzoom_factor += zoomY_Percentage;
 
-            float cell_width = cell_width_base * hzoom_factor, hscale = hscale_base[hscale_level];
-            float cell_height = cell_height_base * vzoom_factor, vscale = vscale_base[vscale_level];
+            float cell_width = cell_width_base * hzoom_factor;
+            float cell_height = cell_height_base * vzoom_factor;
             if (vscale_level <= vscale_base[vscale_base.Count() - 1])
             {
                 float new_vscale = vscale_base[vscale_level + 1];
@@ -257,8 +274,8 @@ namespace TemperatureMonitor.Graphics
         }
         public void OnPan(float panX_Percentage, float panY_Percentage)
         {
-            float cell_width = cell_width_base * hzoom_factor, hscale = hscale_base[hscale_level];
-            float cell_height = cell_height_base * vzoom_factor, vscale = vscale_base[vscale_level];
+            float cell_width = cell_width_base * hzoom_factor;
+            float cell_height = cell_height_base * vzoom_factor;
 
             hoffset -= panX_Percentage / cell_width * hscale;
             voffset += panY_Percentage / cell_height * vscale;
@@ -294,5 +311,7 @@ namespace TemperatureMonitor.Graphics
 
         int nspan { get { return int.Min((int)float.Floor(hscale / cell_width) + 1, maxCount); } }
         int mspan { get { return (int)float.Floor(1 / cell_height); } }
+
+        int hcount { get { return int.Min((int)float.Floor(1 / cell_width) + 1, (int)float.Floor(maxCount / hscale)); } }
     }
 }
