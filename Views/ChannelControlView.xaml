@@ -3,7 +3,6 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="TemperatureMonitor.Views.ChannelControlView"
              xmlns:views="clr-namespace:TemperatureMonitor.Views"
-             xmlns:controls="clr-namespace:TemperatureMonitor.Views.Controls"
              x:Name="this">
     <ContentView.Resources>
         <ResourceDictionary>
@@ -19,12 +18,12 @@
                 <Label Text="{Binding Name, Source={x:Reference this}}" HorizontalOptions="Start" VerticalOptions="Start" FontSize="Title"/>
                 <!--温度-->
                 <HorizontalStackLayout>
-                    <controls:IconLabel Text="{Binding TemperatureIcon, Source={x:Reference this}}"/>
+                    <views:IconLabel Text="{Binding TemperatureIcon, Source={x:Reference this}}"/>
                     <Label Text="{Binding Temperature, Source={x:Reference this}}" Margin="20,0,0,0" FontSize="20"/>
                 </HorizontalStackLayout>
                 <!--电量-->
                 <HorizontalStackLayout>
-                    <controls:IconLabel Text="{Binding BatteryIcon, Source={x:Reference this}}"/>
+                    <views:IconLabel Text="{Binding BatteryIcon, Source={x:Reference this}}"/>
                     <Label Text="{Binding Battery, Source={x:Reference this}}" Margin="20,0,0,0" FontSize="20"/>
                 </HorizontalStackLayout>
             </VerticalStackLayout>

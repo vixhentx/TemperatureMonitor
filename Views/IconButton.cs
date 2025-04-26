@@ -1,9 +1,9 @@
-namespace TemperatureMonitor.Views.Controls;
+namespace TemperatureMonitor.Views;
 
 public class IconButton : Button
 {
-	public IconButton()
-	{
+    public IconButton()
+    {
         BackgroundColor = Colors.Transparent;
         Padding = 0;
         BorderWidth = 0;

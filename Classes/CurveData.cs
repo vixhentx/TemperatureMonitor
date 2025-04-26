@@ -4,14 +4,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TemperatureMonitor.Graphics
+namespace TemperatureMonitor.Classes
 {
-    public class CurveData 
+    public class CurveData
     {
         List<double> prefix_sum = new List<double>();
         protected List<CurvePoint> _source = new List<CurvePoint>();
         public bool visable = true;
-        public Color curveColor=Colors.Red;
+        public Color curveColor = Colors.Red;
         public int Count
         {
             get { return _source.Count; }
@@ -33,16 +33,16 @@ namespace TemperatureMonitor.Graphics
             for (int i = 1; i < _source.Count; i++)
             {
                 d = (_source[i].timePos - _source[i - 1].timePos).Seconds;
-                prefix_sum.Add(prefix_sum[prefix_sum.Count - 1] + _source[i].tempPos*d);
+                prefix_sum.Add(prefix_sum[prefix_sum.Count - 1] + _source[i].tempPos * d);
             }
         }
         protected int GetIndexFromDateTime(DateTime time)
         {
             //二分跑的够快，放心（
-            int l=0, r=_source.Count,mid;
-            while(l<r)
+            int l = 0, r = _source.Count, mid;
+            while (l < r)
             {
-                mid=(l+r)/2;
+                mid = (l + r) / 2;
                 if (_source[mid].timePos < time)
                 {
                     l = mid + 1;
@@ -71,11 +71,11 @@ namespace TemperatureMonitor.Graphics
                 _source[i].tempPos = value;
             }
         }
-        public float this[int l,int r]
+        public float this[int l, int r]
         {
             get
             {
-                return GetAverage(l,r);
+                return GetAverage(l, r);
             }
         }
         public float this[DateTime t]
@@ -89,11 +89,11 @@ namespace TemperatureMonitor.Graphics
                 _source[GetIndexFromDateTime(t)].tempPos = value;
             }
         }
-        public float this[DateTime start,DateTime end]
+        public float this[DateTime start, DateTime end]
         {
             get
             {
-                int l=GetIndexFromDateTime(start),r=GetIndexFromDateTime(end);
+                int l = GetIndexFromDateTime(start), r = GetIndexFromDateTime(end);
                 return this[l, r];
             }
         }
