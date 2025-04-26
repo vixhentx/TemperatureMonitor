@@ -12,7 +12,6 @@ namespace TemperatureMonitor
         {
             InitializeComponent();
 
-            curveView.EnableGenstrueRecognizer();
 
             vPanel.Target = curveView;
             hPanel.Target = curveView;

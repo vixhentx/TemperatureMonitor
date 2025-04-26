@@ -3,10 +3,10 @@ using TemperatureMonitor.Classes;
 
 namespace TemperatureMonitor.Views;
 
-public class CurveView : GraphicsView
+public partial class CurveView : GraphicsView
 {
 
-    BindableProperty SourceProperty = BindableProperty.Create(nameof(Source),typeof(List<CurveData>),typeof(CurveView),new List<CurveData>());
+    BindableProperty SourceProperty = BindableProperty.Create(nameof(Source), typeof(List<CurveData>), typeof(CurveView), new List<CurveData>());
 
     public List<CurveData> Source
     {
@@ -14,20 +14,13 @@ public class CurveView : GraphicsView
         set => SetValue(SourceProperty, value);
     }
 
-    CurveDrawable drawable; 
+    CurveDrawable drawable;
     public CurveView()
-	{
-        Drawable = new CurveDrawable();
-        drawable=(CurveDrawable)Drawable;
-        drawable.data=Source;
-
-    }
-    public void EnableGenstrueRecognizer()
     {
-        PanGestureRecognizer panGestureRecognizer = new();
-        panGestureRecognizer.AddLogicalChild(this);
-        panGestureRecognizer.PanUpdated += PanGestureRecognizer_PanUpdated;
-        GestureRecognizers.Add(panGestureRecognizer);
+        Drawable = new CurveDrawable();
+        drawable = (CurveDrawable)Drawable;
+        drawable.data = Source;
+        InitializeComponent();
     }
     double last_tx = 0, last_ty = 0, now_x = 0, now_y = 0;
     private void PanGestureRecognizer_PanUpdated(object? sender, PanUpdatedEventArgs e)
