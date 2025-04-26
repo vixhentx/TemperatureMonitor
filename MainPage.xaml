@@ -1,28 +1,51 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:graphics="clr-namespace:TemperatureMonitor.Graphics"
              xmlns:views="clr-namespace:TemperatureMonitor.Views"
+             xmlns:controls="clr-namespace:TemperatureMonitor.Views.Controls"
              xmlns:classes="clr-namespace:TemperatureMonitor.Classes"
              x:Class="TemperatureMonitor.MainPage"
              Title="">
 
     <ContentPage.Resources>
+        <graphics:CurveDrawable x:Key="curve_drawable"/>
         <classes:ChannelState x:Key="ch1_state"/>
     </ContentPage.Resources>
     <Grid>
         <!--#region 上部菜单-->
         <HorizontalStackLayout HorizontalOptions="Start" VerticalOptions="Start" HeightRequest="80" Margin="0,5,5,0">
-            <views:CurveControlView x:Name= "hPanel" Direction="Horizonal" Text="水平缩放" WidthRequest="200" VerticalOptions="Start" Margin="0,5,5,0"/>
-            <views:CurveControlView x:Name= "vPanel" Direction="Vertical" Text="垂直缩放" WidthRequest="200" VerticalOptions="Start" Margin="0,5,5,0"/>
+            <Grid x:Name= "hPanel" WidthRequest="200" VerticalOptions="Start" Margin="5">
+                <Grid.GestureRecognizers>
+                    <TapGestureRecognizer NumberOfTapsRequired="2" Tapped="hPannel_Reset"/>
+                </Grid.GestureRecognizers>
+                <Slider x:Name="hscaleSlider" WidthRequest="100" Minimum="0" Maximum="1" VerticalOptions="Center" HorizontalOptions="Center" Margin="0,10,0,0" ValueChanged="hscaleSlider_ValueChanged"/>
+                <controls:IconButton x:Name="hscaleMinusButton" Text="&#xe6f6;" FontFamily="iconfont" WidthRequest="30" HeightRequest="40" BorderWidth="0" Padding="0" CornerRadius="20" VerticalOptions="Center" HorizontalOptions="Start" Clicked="hscaleMinusButton_Clicked"/>
+                <controls:IconButton x:Name="hscalePlusButton" Text="&#xe620;" FontFamily="iconfont" WidthRequest="30" HeightRequest="40" BorderWidth="0" Padding="0" CornerRadius="20" VerticalOptions="Center" HorizontalOptions="End" Clicked="hscalePlusButton_Clicked"/>
+                <Label Text="水平缩放" HorizontalOptions="Center" VerticalOptions="End"  Margin="0,0,0,-25"/>
+            </Grid>
+            <Grid x:Name="vPanel" WidthRequest="200" VerticalOptions="Start" Margin="5">
+                <Grid.GestureRecognizers>
+                    <TapGestureRecognizer NumberOfTapsRequired="2" Tapped="vPannel_Reset"/>
+                </Grid.GestureRecognizers>
+                <Slider x:Name="vscaleSlider" WidthRequest="100" Minimum="0" Maximum="1" VerticalOptions="Center" HorizontalOptions="Center" Margin="0,10,0,0" ValueChanged="vscaleSlider_ValueChanged"/>
+                <controls:IconButton x:Name="vscaleMinusButton" Text="&#xe6f6;" WidthRequest="30" HeightRequest="40" BorderWidth="0" Padding="0" CornerRadius="20" VerticalOptions="Center" HorizontalOptions="Start" Clicked="vscaleMinusButton_Clicked"/>
+                <controls:IconButton x:Name="vscalePlusButton" Text="&#xe620;" WidthRequest="30" HeightRequest="40" BorderWidth="0" Padding="0" CornerRadius="20" VerticalOptions="Center" HorizontalOptions="End" Clicked="vscalePlusButton_Clicked"/>
+                <Label Text="垂直缩放" HorizontalOptions="Center" VerticalOptions="End"  Margin="0,0,0,-25"/>
+            </Grid>
         </HorizontalStackLayout>
         <HorizontalStackLayout HorizontalOptions="End" VerticalOptions="Start" HeightRequest="80" Margin="0,5,5,0" >
-            <views:IconButton x:Name="trackButton" Text="&#xe63f;" WidthRequest="50" HeightRequest="50" Margin="5,0" Clicked="trackButton_Clicked" />
-            <views:IconButton x:Name="autoButton" Text="&#xe60a;" WidthRequest="50" HeightRequest="50" Margin="5,0" Clicked="autoButton_Clicked"/>
-            <views:IconButton x:Name="startButton" Text="&#xe6bd;" WidthRequest="50" HeightRequest="50" Margin="5,0" Clicked="startButton_Clicked"/>
+            <controls:IconButton x:Name="trackButton" Text="&#xe63f;" WidthRequest="50" HeightRequest="50" Margin="5,0" Clicked="trackButton_Clicked" />
+            <controls:IconButton x:Name="autoButton" Text="&#xe60a;" WidthRequest="50" HeightRequest="50" Margin="5,0" Clicked="autoButton_Clicked"/>
+            <controls:IconButton x:Name="startButton" Text="&#xe6bd;" WidthRequest="50" HeightRequest="50" Margin="5,0" Clicked="startButton_Clicked"/>
         </HorizontalStackLayout>
         <!--#endregion-->
         <!--#region 曲线图-->
-        <views:CurveView x:Name="curveView" Margin="10,85,10,55" HorizontalOptions="Fill" VerticalOptions="Fill" />
+        <GraphicsView x:Name="curveView" Drawable="{StaticResource curve_drawable}" Margin="10,85,10,55" HorizontalOptions="Fill" VerticalOptions="Fill" >
+            <GraphicsView.GestureRecognizers>
+                <PanGestureRecognizer PanUpdated="PanGestureRecognizer_PanUpdated"/>
+            </GraphicsView.GestureRecognizers>
+        </GraphicsView>
         <!--endregion-->
         <!--#region 下部菜单-->
         <HorizontalStackLayout Margin="10" VerticalOptions="End" HeightRequest="140">

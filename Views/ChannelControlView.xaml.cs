@@ -1,5 +1,6 @@
 using System.Threading.Channels;
 using TemperatureMonitor.Classes;
+using TemperatureMonitor.Graphics;
 
 namespace TemperatureMonitor.Views;
 

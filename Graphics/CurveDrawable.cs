@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TemperatureMonitor.Classes
+namespace TemperatureMonitor.Graphics
 {
     //思路：先用旧的比例尺等参数计算，再根据算出来的方格大小来决定更适合的比例尺
     //当方格大小超过设定范围时，就会通过GetScaleLevel设定新的比例尺，并重新计算方格大小
@@ -55,19 +55,19 @@ namespace TemperatureMonitor.Classes
         {
             if (hoffset.AddSeconds(hcount) > DateTime.Now) hoffset = DateTime.Now.AddSeconds(-hcount);
             voffset = Math.Clamp(voffset, ymin, ymax);
-            hscale_level = Math.Clamp(hscale_level, 0, max_hscale_level);
-            vscale_level = Math.Clamp(vscale_level, 0, max_vscale_level);
+            hscale_level = Math.Clamp(hscale_level,0,max_hscale_level);
+            vscale_level = Math.Clamp(vscale_level,0,max_vscale_level);
         }
         public void Draw(ICanvas canvas, RectF dirtyRect)
         {
             Check();
 
             DrawAxis(canvas, dirtyRect);
-            foreach (var d in data)
+            foreach(var d in data)
             {
-                if (d.visable)
+                if(d.visable)
                 {
-                    DrawCurve(d, canvas, dirtyRect);
+                    DrawCurve(d,canvas,dirtyRect);
                 }
             }
         }
@@ -108,7 +108,7 @@ namespace TemperatureMonitor.Classes
             {
                 float x = xbegin + (i - hoffset.Millisecond / 1000f / hscale) * cell_width * width;
                 float y = ybegin + reserved_area_for_hscale;
-                string s = hoffset.AddSeconds(((int)hscale * (2 * i + 1) - 1) / 2).ToString("HH:mm:ss");
+                string s = (hoffset.AddSeconds(((int)hscale * (2 * i + 1) - 1) / 2)).ToString("HH:mm:ss");
                 canvas.DrawString(s, x, y, HorizontalAlignment.Center);
             }
         }
@@ -128,8 +128,8 @@ namespace TemperatureMonitor.Classes
 
             for (int i = 0; i < hcount; i++)
             {
-                points[i].X = xbegin + (i - hoffset.Millisecond / 1000f / hscale) * cell_width * width;
-                points[i].Y = ybegin - (d[hoffset.AddSeconds(i * hscale - hoffset.Millisecond / 1000f), hoffset.AddSeconds((i + 1) * hscale - hoffset.Millisecond / 1000f)] - voffset) / vscale * cell_height * height;
+                points[i].X = xbegin + (i - hoffset.Millisecond / 1000f / hscale)  * cell_width * width;
+                points[i].Y = ybegin - (d[hoffset.AddSeconds((i * hscale) - hoffset.Millisecond / 1000f), hoffset.AddSeconds(((i+1) * hscale) - hoffset.Millisecond / 1000f)] - voffset) / vscale * cell_height * height;
             }
 
 
@@ -151,20 +151,20 @@ namespace TemperatureMonitor.Classes
         }
         public void Auto()
         {
-            float min = ymax, max = ymin;
+            float min=ymax, max=ymin;
             foreach (var d in data)
             {
                 for (int i = 0; i < hcount; i++)
                 {
-                    var v = d[hoffset.AddSeconds((int)hscale * i), hoffset.AddSeconds((int)hscale * (i + 1))];
+                    var v = d[hoffset.AddSeconds((int)hscale * i),hoffset.AddSeconds((int)hscale * (i+1) )];
                     if (v < min) min = v;
                     if (v > max) max = v;
                 }
             }
 
-            vscale_level = Math.Clamp(GetScaleLevel(max - min, 0.1f, vscale_base), 0, max_vscale_level);
+            vscale_level = Math.Clamp(GetScaleLevel(max - min, 0.1f, vscale_base),0,max_vscale_level);
             Check();
-            vzoom_factor = vscale / (cell_height_base * (max - min));
+            vzoom_factor = (vscale) / (cell_height_base * (max - min));
             voffset = min - 0.5f * cell_height * vscale;
 
         }
@@ -280,11 +280,15 @@ namespace TemperatureMonitor.Classes
             float cell_width = cell_width_base * hzoom_factor;
             float cell_height = cell_height_base * vzoom_factor;
 
-            hoffset = hoffset.AddSeconds(-panX_Percentage / cell_width * hscale);
+            hoffset=hoffset.AddSeconds( - panX_Percentage / cell_width * hscale);
             voffset += panY_Percentage / cell_height * vscale;
             Check();
         }
 
+        public void Invalidate()
+        {
+
+        }
 
 
         public int max_hscale_level { get { return hscale_base.Length - 1; } }

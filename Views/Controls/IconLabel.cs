@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TemperatureMonitor.Views
+namespace TemperatureMonitor.Views.Controls
 {
-    public class IconLabel : Label
+    public class IconLabel: Label
     {
         public IconLabel()
         {

@@ -1,6 +1,6 @@
 ﻿using System.Numerics;
 using System.Threading.Channels;
-using TemperatureMonitor.Classes;
+using TemperatureMonitor.Graphics;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace TemperatureMonitor
@@ -11,10 +11,6 @@ namespace TemperatureMonitor
         public MainPage()
         {
             InitializeComponent();
-
-            vPanel.Target = curveView;
-            hPanel.Target = curveView;
-
             ch1ControlView.Source.curveColor = Colors.Red;
             ch1ControlView.State.Battery = 40;
             ch1ControlView.State.Temperature = 20f;
@@ -86,6 +82,73 @@ namespace TemperatureMonitor
         }
 
 
+        double last_tx=0, last_ty=0, now_x=0, now_y=0;
+
+
+        private void PanGestureRecognizer_PanUpdated(object sender, PanUpdatedEventArgs e)
+        {
+            CurveDrawable s = (CurveDrawable)curveView.Drawable;
+            float width = (float) curveView.Width , height = (float) curveView.Height ;
+            switch (e.StatusType)
+            {
+                case GestureStatus.Running:
+                    
+                    now_x = e.TotalX - last_tx;
+                    now_y = e .TotalY - last_ty;
+                    s.OnPan((float)now_x/width, (float)now_y/height);
+                    curveView.Invalidate();
+                    last_tx = e.TotalX;
+                    last_ty = e .TotalY;
+                    break;
+                case GestureStatus.Completed:
+                    last_tx = 0;
+                    last_ty = 0;
+                    break;
+            }
+        }
+        private void vscaleSlider_ValueChanged(object sender, EventArgs e)
+        {
+            CurveDrawable s = (CurveDrawable)curveView.Drawable;
+            s.OnChangeCellHeight((float)vscaleSlider.Value);
+            curveView.Invalidate();
+        }
+
+        private void hscaleMinusButton_Clicked(object sender, EventArgs e)
+        {
+            CurveDrawable s = (CurveDrawable) curveView.Drawable;
+            if (s.hscale_level >= s.max_hscale_level) return;
+            s.hscale_level += 1;
+            hscaleSlider.Value = 1;
+            curveView.Invalidate();
+        }
+
+        private void hscalePlusButton_Clicked(object sender, EventArgs e)
+        {
+            CurveDrawable s = (CurveDrawable)curveView.Drawable;
+            if (s.hscale_level <=0) return;
+            s.hscale_level -= 1;
+            hscaleSlider.Value = 0;
+            curveView.Invalidate();
+        }
+
+        private void vscaleMinusButton_Clicked(object sender, EventArgs e)
+        {
+            CurveDrawable s = (CurveDrawable)curveView.Drawable;
+            if (s.vscale_level >= s.max_vscale_level) return;
+            s.vscale_level += 1;
+            vscaleSlider.Value = 1;
+            curveView.Invalidate();
+        }
+
+        private void vscalePlusButton_Clicked(object sender, EventArgs e)
+        {
+            CurveDrawable s = (CurveDrawable)curveView.Drawable;
+            if (s.vscale_level <=0) return;
+            s.vscale_level -= 1;
+            vscaleSlider.Value = 0;
+            curveView.Invalidate();
+        }
+
         bool is_started = false;
         private void startButton_Clicked(object sender, EventArgs e)
         {
@@ -99,7 +162,7 @@ namespace TemperatureMonitor
         {
             CurveDrawable s = (CurveDrawable)curveView.Drawable;
             s.Auto();
-            vPanel.ChangeSliderValue(s.GetCellHeightPercent(s.vzoom_factor));
+            vscaleSlider.Value = s.GetCellHeightPercent(s.vzoom_factor);
             curveView.Invalidate();
         }
 
@@ -115,6 +178,28 @@ namespace TemperatureMonitor
             }
         }
 
+        private void hscaleSlider_ValueChanged(object sender, ValueChangedEventArgs e)
+        {
+            CurveDrawable s = (CurveDrawable)curveView.Drawable;
+            s.OnChangeCellWidth((float)hscaleSlider.Value);
+            curveView.Invalidate();
+        }
+        private void vPannel_Reset(object sender, TappedEventArgs e)
+        {
+            CurveDrawable s = (CurveDrawable)curveView.Drawable;
+            float v = s.GetCellHeightPercent(1.0f);
+            s.vzoom_factor = 1.0f;
+            vscaleSlider.Value = v;
+            curveView.Invalidate();
+        }
+        private void hPannel_Reset(object sender, TappedEventArgs e)
+        {
+            CurveDrawable s = (CurveDrawable)curveView.Drawable;
+            float v = s.GetCellWidthPercent(1.0f);
+            s.hzoom_factor = 1.0f;
+            hscaleSlider.Value = v;
+            curveView.Invalidate();
+        }
     }
 
 }
