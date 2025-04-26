@@ -1,4 +1,5 @@
 ﻿using System.Numerics;
+using System.Threading.Channels;
 using TemperatureMonitor.Graphics;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
@@ -10,6 +11,9 @@ namespace TemperatureMonitor
         public MainPage()
         {
             InitializeComponent();
+            ch1ControlView.Source.curveColor = Colors.Red;
+            ch1ControlView.State.Battery = 40;
+            ch1ControlView.State.Temperature = 20f;
         }
 
         private void OnTick()
@@ -150,6 +154,10 @@ namespace TemperatureMonitor
         private void startButton_Clicked(object sender, EventArgs e)
         {
             is_started = !is_started;
+
+            CurveDrawable drawable = (CurveDrawable)curveView.Drawable;
+            test();
+            ch1ControlView.Source = drawable.data[0];
         }
         private void autoButton_Clicked(object sender, EventArgs e)
         {

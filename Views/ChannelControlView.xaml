@@ -2,11 +2,33 @@
 <ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="TemperatureMonitor.Views.ChannelControlView"
+             xmlns:classes="clr-namespace:TemperatureMonitor.Classes"
              x:Name="this">
-    <Frame WidthRequest="120" HeightRequest="80" HasShadow="True" Margin="10" Padding="8" CornerRadius="5">
+    <ContentView.Resources>
+        <ResourceDictionary>
+            <Style TargetType="Label">
+                <Setter Property="VerticalTextAlignment" Value="Center"/>
+            </Style>
+        </ResourceDictionary>
+    </ContentView.Resources>
+    <Frame WidthRequest="220" HeightRequest="120" HasShadow="True" Margin="10" Padding="8" CornerRadius="5">
         <Grid>
-            <Label Text="{Binding Name}" HorizontalOptions="Start" VerticalOptions="Start"/>
-            <Ellipse StrokeThickness="0" Fill="{Binding Color}" HorizontalOptions="End" VerticalOptions="End" Margin="5" HeightRequest="30" WidthRequest="30"/>
+            <VerticalStackLayout>
+                <!--名称-->
+                <Label Text="{Binding Name, Source={x:Reference this}}" HorizontalOptions="Start" VerticalOptions="Start" FontSize="Title"/>
+                <!--温度-->
+                <HorizontalStackLayout>
+                    <Label Text="{Binding TemperatureIcon, Source={x:Reference this}}" FontFamily="iconfont" FontSize="Large"/>
+                    <Label Text="{Binding Temperature, Source={x:Reference this}}" Margin="20,0,0,0" FontSize="20"/>
+                </HorizontalStackLayout>
+                <!--电量-->
+                <HorizontalStackLayout>
+                    <Label Text="{Binding BatteryIcon, Source={x:Reference this}}" FontFamily="iconfont" FontSize="Large"/>
+                    <Label Text="{Binding Battery, Source={x:Reference this}}" Margin="20,0,0,0" FontSize="20"/>
+                </HorizontalStackLayout>
+            </VerticalStackLayout>
+            <!--颜色-->
+            <Ellipse StrokeThickness="0" Fill="{Binding Color ,Source={x:Reference this}}" HorizontalOptions="End" VerticalOptions="End" Margin="5" HeightRequest="30" WidthRequest="30"/>
         </Grid>
     </Frame>
 </ContentView>

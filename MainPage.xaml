@@ -2,13 +2,17 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:graphics="clr-namespace:TemperatureMonitor.Graphics"
+             xmlns:views="clr-namespace:TemperatureMonitor.Views"
+             xmlns:classes="clr-namespace:TemperatureMonitor.Classes"
              x:Class="TemperatureMonitor.MainPage"
              Title="">
 
     <ContentPage.Resources>
         <graphics:CurveDrawable x:Key="curve_drawable"/>
+        <classes:ChannelState x:Key="ch1_state"/>
     </ContentPage.Resources>
     <Grid>
+        <!--#region 上部菜单-->
         <HorizontalStackLayout HorizontalOptions="Start" VerticalOptions="Start" HeightRequest="80" Margin="0,5,5,0">
             <Grid x:Name= "hPanel" WidthRequest="200" VerticalOptions="Start" Margin="5">
                 <Grid.GestureRecognizers>
@@ -34,11 +38,19 @@
             <Button x:Name="autoButton" Text="A" WidthRequest="50" HeightRequest="50" Margin="5,0" Clicked="autoButton_Clicked"/>
             <Button x:Name="trackButton" Text="T" WidthRequest="50" HeightRequest="50" Margin="5,0" Clicked="trackButton_Clicked" />
         </HorizontalStackLayout>
+        <!--#endregion-->
+        <!--#region 曲线图-->
         <GraphicsView x:Name="curveView" Drawable="{StaticResource curve_drawable}" Margin="10,85,10,55" HorizontalOptions="Fill" VerticalOptions="Fill" >
             <GraphicsView.GestureRecognizers>
                 <PanGestureRecognizer PanUpdated="PanGestureRecognizer_PanUpdated"/>
             </GraphicsView.GestureRecognizers>
         </GraphicsView>
+        <!--endregion-->
+        <!--#region 下部菜单-->
+        <HorizontalStackLayout Margin="10" VerticalOptions="End" HeightRequest="140">
+            <views:ChannelControlView x:Name="ch1ControlView" Channel="0" State="{StaticResource ch1_state}"/>
+        </HorizontalStackLayout>
+        <!--#endregion-->
     </Grid>
 
 </ContentPage>
