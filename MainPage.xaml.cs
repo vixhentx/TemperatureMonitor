@@ -55,7 +55,6 @@ namespace TemperatureMonitor
             };
             drawable.data.Clear();
             drawable.data.Add(d);
-
             dt= DateTime.Now.AddSeconds(-20);
             points.Clear();
             for (int i = 0; i < 20; i++) 
