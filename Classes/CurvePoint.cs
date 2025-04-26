@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TemperatureMonitor.Graphics
+namespace TemperatureMonitor.Classes
 {
     public class CurvePoint
     {

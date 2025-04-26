@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="TemperatureMonitor.Views.CurveControlView"
+             xmlns:views="clr-namespace:TemperatureMonitor.Views"
+             >
+    <Grid WidthRequest="180" VerticalOptions="Start" Margin="5">
+        <Grid.GestureRecognizers>
+            <TapGestureRecognizer NumberOfTapsRequired="2" Tapped="OnReset"/>
+        </Grid.GestureRecognizers>
+        <Slider x:Name="slider" WidthRequest="100" Minimum="0" Maximum="1" VerticalOptions="Center" HorizontalOptions="Center" Margin="0,5,0,5" ValueChanged="OnSlide"/>
+        <views:IconButton x:Name="minusButton" Text="&#xe6f6;" FontFamily="iconfont" WidthRequest="30" HeightRequest="40" BorderWidth="0" Padding="0" CornerRadius="20" VerticalOptions="Center" HorizontalOptions="Start" Clicked="OnMinus"/>
+        <views:IconButton x:Name="plusButton" Text="&#xe620;" FontFamily="iconfont" WidthRequest="30" HeightRequest="40" BorderWidth="0" Padding="0" CornerRadius="20" VerticalOptions="Center" HorizontalOptions="End" Clicked="OnPlus"/>
+        <Label x:Name="label" HorizontalOptions="Center" VerticalOptions="End"  Margin="0,0,0,-25"/>
+    </Grid>
+</ContentView>
