@@ -39,7 +39,6 @@
                 <PanGestureRecognizer PanUpdated="PanGestureRecognizer_PanUpdated"/>
             </GraphicsView.GestureRecognizers>
         </GraphicsView>
-        <Button x:Name="testButton" VerticalOptions="End" Clicked="testButton_Clicked"/>
     </Grid>
 
 </ContentPage>

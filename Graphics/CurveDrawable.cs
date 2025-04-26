@@ -162,9 +162,9 @@ namespace TemperatureMonitor.Graphics
                 }
             }
 
-            vscale_level = GetScaleLevel(max - min, 0.1f, vscale_base);
-            vzoom_factor = (vscale) / (cell_height_base * (max - min));
+            vscale_level = Math.Clamp(GetScaleLevel(max - min, 0.1f, vscale_base),0,max_vscale_level);
             Check();
+            vzoom_factor = (vscale) / (cell_height_base * (max - min));
             voffset = min - 0.5f * cell_height * vscale;
 
         }
@@ -192,6 +192,7 @@ namespace TemperatureMonitor.Graphics
                 max = vscale_base[vscale_level];
             }
             vzoom_factor = min + vPercentage * (max - min);
+            Check();
         }
         public float GetCellHeightPercent(float vzf)
         {
@@ -234,6 +235,7 @@ namespace TemperatureMonitor.Graphics
                 max = hscale_base[hscale_level];
             }
             hzoom_factor = min + hPercentage * (max - min);
+            Check();
         }
         public float GetCellWidthPercent(float hzf)
         {
@@ -280,6 +282,7 @@ namespace TemperatureMonitor.Graphics
 
             hoffset=hoffset.AddSeconds( - panX_Percentage / cell_width * hscale);
             voffset += panY_Percentage / cell_height * vscale;
+            Check();
         }
 
         public void Invalidate()

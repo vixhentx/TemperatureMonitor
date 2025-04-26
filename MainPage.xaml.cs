@@ -12,7 +12,22 @@ namespace TemperatureMonitor
             InitializeComponent();
         }
 
-        private void testButton_Clicked(object sender, EventArgs e)
+        private void OnTick()
+        {
+
+        }
+        private void AddData(CurvePoint pointData,int channel)
+        {
+            CurveDrawable drawable = (CurveDrawable)curveView.Drawable;
+            drawable.data[channel].AddPoint(pointData);
+        }
+        private void SetDatas(List<CurvePoint> initialPointData,int channel)
+        {
+            CurveDrawable drawable = (CurveDrawable)curveView.Drawable;
+            drawable.data[channel].SetSource(initialPointData);
+        }
+
+        private void test()
         {
             Random rand=new Random();
             CurveDrawable drawable = (CurveDrawable)curveView.Drawable;
@@ -131,10 +146,10 @@ namespace TemperatureMonitor
             curveView.Invalidate();
         }
 
-
+        bool is_started = false;
         private void startButton_Clicked(object sender, EventArgs e)
         {
-
+            is_started = !is_started;
         }
         private void autoButton_Clicked(object sender, EventArgs e)
         {
