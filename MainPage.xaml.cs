@@ -1,5 +1,4 @@
-﻿using System.Collections.ObjectModel;
-using TemperatureMonitor.Classes;
+﻿using TemperatureMonitor.Classes;
 using TemperatureMonitor.ViewModels;
 using TemperatureMonitor.Views;
 
@@ -81,6 +80,8 @@ namespace TemperatureMonitor
             drawable.vscale_level = 2;
             drawable.hscale_level = 0;
             drawable.hoffset = dt;
+
+            viewModel.Channels.Clear();
 
             viewModel.Channels.Add(new()
             {

@@ -28,9 +28,33 @@
         <HorizontalStackLayout BindableLayout.ItemsSource="{Binding Channels}" x:Name="channelPanel" Margin="10" VerticalOptions="End" HeightRequest="140">
             <BindableLayout.ItemTemplate>
                 <DataTemplate x:DataType="classes:ChannelControllerModel">
-                    <!--views:ChannelControlView Name="{Binding Name}" Curve="{Binding Curve}" State="{Binding State}" Channel="{Binding Channel}"/-->
-                    
-                    <!--views:ChannelControlView Source="{Binding }"/-->
+                    <Frame WidthRequest="220" HeightRequest="120" HasShadow="True" Margin="10" Padding="8" CornerRadius="5">
+                        <Frame.Resources>
+                            <ResourceDictionary>
+                                <Style TargetType="Label">
+                                    <Setter Property="VerticalTextAlignment" Value="Center"/>
+                                </Style>
+                            </ResourceDictionary>
+                        </Frame.Resources>
+                        <Grid>
+                            <VerticalStackLayout>
+                                <!--名称-->
+                                <Label Text="{Binding Name}" HorizontalOptions="Start" VerticalOptions="Start" FontSize="Title"/>
+                                <!--温度-->
+                                <HorizontalStackLayout>
+                                    <views:IconLabel Text="{Binding TemperatureIcon}"/>
+                                    <Label Text="{Binding Temperature}" Margin="20,0,0,0" FontSize="20"/>
+                                </HorizontalStackLayout>
+                                <!--电量-->
+                                <HorizontalStackLayout>
+                                    <views:IconLabel Text="{Binding BatteryIcon}"/>
+                                    <Label Text="{Binding Battery}" Margin="20,0,0,0" FontSize="20"/>
+                                </HorizontalStackLayout>
+                            </VerticalStackLayout>
+                            <!--颜色-->
+                            <Ellipse StrokeThickness="0" Fill="{Binding Color}" HorizontalOptions="End" VerticalOptions="End" Margin="5" HeightRequest="30" WidthRequest="30"/>
+                        </Grid>
+                    </Frame>
                 </DataTemplate>
             </BindableLayout.ItemTemplate>
         </HorizontalStackLayout>
