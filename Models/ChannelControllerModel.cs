@@ -15,7 +15,7 @@ namespace TemperatureMonitor.Classes
         public int Channel {  get; set; }
         public Color Color => Curve.curveColor;
         public string Battery => State.Battery.ToString() + "%";
-        public string Temperature => State.Temperature.ToString() + "℃";
+        public string Temperature => State.Temperature.ToString("0.0") + "℃";
 
         static string[] bat_icontable = { "\ue631", "\ue62c", "\ue62e", "\ue632", "\ue630", "\ue62d", "\ue62f" };
         public string BatteryIcon
@@ -39,7 +39,7 @@ namespace TemperatureMonitor.Classes
         {
             get
             {
-                float temp = State.Temperature, ltemp = State.last_temperature;
+                float temp = State.Temperature, ltemp = State.LastTemperature;
                 int state = 0;
                 if (temp > ltemp) state = 1;
                 else if (temp < ltemp) state = 2;

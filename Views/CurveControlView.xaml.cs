@@ -13,7 +13,7 @@ public partial class CurveControlView : ContentView
     public string Text
     {
         get => _text;
-        set { _text = value; }
+        set { label.Text=_text = value; }
     }
     public CurveView Target
     {
@@ -34,7 +34,6 @@ public partial class CurveControlView : ContentView
     public CurveControlView()
 	{
 		InitializeComponent();
-        label.Text = _text;
 	}
 
     private void OnReset(object sender, TappedEventArgs e)

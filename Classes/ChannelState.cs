@@ -12,15 +12,16 @@ namespace TemperatureMonitor.Classes
      */
     public class ChannelState
     {
-        protected float _temperature=20;
-        public float last_temperature=20;
+        protected float _temperature;
+        protected float _last_temperature;
         public int Battery { get; set; } /* 0~100 */
+        public float LastTemperature => _last_temperature;
         public float Temperature
         {
             get { return _temperature; }
             set 
             {
-                last_temperature = _temperature;
+                _last_temperature = _temperature;
                _temperature = value;
             }
         }

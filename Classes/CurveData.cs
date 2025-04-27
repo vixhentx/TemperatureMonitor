@@ -12,15 +12,15 @@ namespace TemperatureMonitor.Classes
         protected List<CurvePoint> _source = new List<CurvePoint>();
         public bool visable = true;
         public Color curveColor = Colors.Red;
-        public int Count
-        {
-            get { return _source.Count; }
-        }
+        public int Count =>_source.Count; 
+        public CurvePoint LastPoint => _source[_source.Count - 1];
+
         public List<CurvePoint> Source
         { set { SetSource(value); } }
         public void AddPoint(CurvePoint point)
         {
-            prefix_sum.Add(prefix_sum[prefix_sum.Count - 1] + point.tempPos);
+            int d = (point.timePos - _source[_source.Count - 1].timePos).Seconds;
+            prefix_sum.Add(prefix_sum[prefix_sum.Count - 1] + point.tempPos * d);
             _source.Add(point);
         }
         public void SetSource(List<CurvePoint> s)
