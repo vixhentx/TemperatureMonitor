@@ -11,12 +11,15 @@ namespace TemperatureMonitor.ViewModels
     public class MainPageViewModel
     {
         public ObservableCollection<ChannelControllerModel> Channels { get; set; }
+        public List<CurveData> Curves { get; set; }
 
         public MainPageViewModel()
         {
             // Test
             Channels = new();
+            Curves = new();
         }
+    
     }
 
 }

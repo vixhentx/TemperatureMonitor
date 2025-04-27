@@ -10,6 +10,8 @@ namespace TemperatureMonitor
         {
             InitializeComponent();
 
+            curveView.Source = viewModel.Curves;
+
             vPanel.Target = curveView;
             hPanel.Target = curveView;
 
@@ -55,8 +57,8 @@ namespace TemperatureMonitor
                 curveColor = Colors.Red,
                 Source = points
             };
-            drawable.data.Clear();
-            drawable.data.Add(d1);
+            viewModel.Curves.Clear();
+            viewModel.Curves.Add(d1);
             dt= DateTime.Now.AddSeconds(-20);
             points.Clear();
             for (int i = 0; i < 20; i++) 
@@ -74,7 +76,7 @@ namespace TemperatureMonitor
                 Source = points
             };
 
-            drawable.data.Add(d2);
+            viewModel.Curves.Add(d2);
 
             drawable.voffset = 18;
             drawable.vscale_level = 2;

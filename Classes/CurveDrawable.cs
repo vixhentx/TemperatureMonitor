@@ -14,7 +14,7 @@ namespace TemperatureMonitor.Classes
     public class CurveDrawable : IDrawable
     {
 
-        public List<CurveData> data = new List<CurveData>();
+        public required List<CurveData> data;
 
         const int vaxis_width = 80, haxis_height = 50;
         static float[] vscale_base = { 0.1F, 0.5F, 1, 5, 10, 20 };//一格多少度

@@ -11,15 +11,16 @@ public partial class CurveView : GraphicsView
     public List<CurveData> Source
     {
         get => (List<CurveData>)GetValue(SourceProperty);
-        set => SetValue(SourceProperty, value);
+        set
+        {
+            SetValue(SourceProperty, value);
+            ((CurveDrawable)Drawable).data = Source;
+        }
     }
 
-    CurveDrawable drawable;
     public CurveView()
     {
-        Drawable = new CurveDrawable();
-        drawable = (CurveDrawable)Drawable;
-        drawable.data = Source;
+        Drawable = new CurveDrawable(){data=Source};
         InitializeComponent();
     }
     double last_tx = 0, last_ty = 0, now_x = 0, now_y = 0;
@@ -32,7 +33,7 @@ public partial class CurveView : GraphicsView
 
                 now_x = e.TotalX - last_tx;
                 now_y = e.TotalY - last_ty;
-                drawable.OnPan((float)now_x / width, (float)now_y / height);
+                ((CurveDrawable)Drawable).OnPan((float)now_x / width, (float)now_y / height);
                 Invalidate();
                 last_tx = e.TotalX;
                 last_ty = e.TotalY;
