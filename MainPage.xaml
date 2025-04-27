@@ -2,13 +2,13 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:views="clr-namespace:TemperatureMonitor.Views"
+             xmlns:viewmodels="clr-namespace:TemperatureMonitor.ViewModels"
              xmlns:classes="clr-namespace:TemperatureMonitor.Classes"
              x:Class="TemperatureMonitor.MainPage"
              Title="">
-
-    <ContentPage.Resources>
-        <classes:ChannelState x:Key="ch1_state"/>
-    </ContentPage.Resources>
+    <ContentPage.BindingContext>
+        <viewmodels:MainPageViewModel x:Name="viewModel"/>
+    </ContentPage.BindingContext>
     <Grid>
         <!--#region 上部菜单-->
         <HorizontalStackLayout HorizontalOptions="Start" VerticalOptions="Start" HeightRequest="80" Margin="0,5,5,0">
@@ -25,10 +25,15 @@
         <views:CurveView x:Name="curveView" Margin="10,85,10,55" HorizontalOptions="Fill" VerticalOptions="Fill" />
         <!--endregion-->
         <!--#region 下部菜单-->
-        <HorizontalStackLayout Margin="10" VerticalOptions="End" HeightRequest="140">
-            <views:ChannelControlView x:Name="ch1ControlView" Channel="0" State="{StaticResource ch1_state}"/>
+        <HorizontalStackLayout BindableLayout.ItemsSource="{Binding Channels}" x:Name="channelPanel" Margin="10" VerticalOptions="End" HeightRequest="140">
+            <BindableLayout.ItemTemplate>
+                <DataTemplate x:DataType="classes:ChannelControllerModel">
+                    <!--views:ChannelControlView Name="{Binding Name}" Curve="{Binding Curve}" State="{Binding State}" Channel="{Binding Channel}"/-->
+                    
+                    <!--views:ChannelControlView Source="{Binding }"/-->
+                </DataTemplate>
+            </BindableLayout.ItemTemplate>
         </HorizontalStackLayout>
         <!--#endregion-->
     </Grid>
-
 </ContentPage>

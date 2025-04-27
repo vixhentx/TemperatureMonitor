@@ -1,24 +1,22 @@
-﻿using System.Numerics;
-using System.Threading.Channels;
+﻿using System.Collections.ObjectModel;
 using TemperatureMonitor.Classes;
-using static System.Runtime.InteropServices.JavaScript.JSType;
+using TemperatureMonitor.ViewModels;
+using TemperatureMonitor.Views;
 
 namespace TemperatureMonitor
 {
     public partial class MainPage : ContentPage
     {
-
         public MainPage()
         {
             InitializeComponent();
 
-
             vPanel.Target = curveView;
             hPanel.Target = curveView;
 
-            ch1ControlView.Source.curveColor = Colors.Red;
-            ch1ControlView.State.Battery = 40;
-            ch1ControlView.State.Temperature = 20f;
+            
+            //Test
+
         }
 
         private void OnTick()
@@ -53,13 +51,13 @@ namespace TemperatureMonitor
                     };
                     points.Add(p);
             }
-            CurveData d = new CurveData
+            CurveData d1 = new CurveData
             {
                 curveColor = Colors.Red,
                 Source = points
             };
             drawable.data.Clear();
-            drawable.data.Add(d);
+            drawable.data.Add(d1);
             dt= DateTime.Now.AddSeconds(-20);
             points.Clear();
             for (int i = 0; i < 20; i++) 
@@ -71,19 +69,44 @@ namespace TemperatureMonitor
                 };
                 points.Add(p);
             }
-            d = new CurveData
+            CurveData d2 = new CurveData
             {
                 curveColor = Colors.Blue,
                 Source = points
             };
 
-            drawable.data.Add(d);
+            drawable.data.Add(d2);
 
             drawable.voffset = 18;
             drawable.vscale_level = 2;
             drawable.hscale_level = 0;
             drawable.hoffset = dt;
+
+            viewModel.Channels.Add(new()
+            {
+                Channel = 1,
+                Curve = curveView.Source[0],
+                Name = "Left",
+                State = new ChannelState()
+                {
+                    Battery = 50,
+                    Temperature = 20
+                }
+            });
+            viewModel.Channels.Add(new()
+            {
+                Channel = 2,
+                Curve = curveView.Source[1],
+                Name = "R",
+                State = new ChannelState()
+                {
+                    Battery = 5,
+                    Temperature = 30
+                }
+            });
+
             curveView.Invalidate();
+
         }
 
 
@@ -94,7 +117,6 @@ namespace TemperatureMonitor
 
             CurveDrawable drawable = (CurveDrawable)curveView.Drawable;
             test();
-            ch1ControlView.Source = drawable.data[0];
         }
         private void autoButton_Clicked(object sender, EventArgs e)
         {
