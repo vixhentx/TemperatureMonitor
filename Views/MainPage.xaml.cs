@@ -8,7 +8,7 @@ namespace TemperatureMonitor
     {
         private CurveDrawable drawable => (CurveDrawable)curveView.Drawable;
 
-        Timer timer ;
+        //Timer timer ;
 
         public MainPage()
         {
@@ -33,71 +33,39 @@ namespace TemperatureMonitor
                 test_append();
             }
         }
-        private void AddData(CurvePoint pointData,int channel)
-        {
-
-        }
-        private void SetDatas(List<CurvePoint> initialPointData,int channel)
-        {
-
-        }
         private void test_append()
         {
             Random rand = new();
-            CurvePoint p1, p2;
-            p1 = new()
-            {
-                tempPos = rand.Next(180, 280) / 10.0f,
-                timePos = DateTime.Now
-            };
-            p2= new()
-            {
-                tempPos = rand.Next(180, 280) / 10.0f,
-                timePos = DateTime.Now
-            };
-            viewModel.Curves[0].AddPoint(p1);
-            viewModel.Curves[1].AddPoint(p2);
-            viewModel.Channels[0].State.Temperature = p1.tempPos;
-            viewModel.Channels[1].State.Temperature = p2.tempPos;
+            var t1= viewModel.Curves[0][DateTime.Now]= rand.Next(180, 280) / 10.0f;
+            var t2= viewModel.Curves[1][DateTime.Now] = rand.Next(180, 280) / 10.0f;
+            viewModel.Channels[0].State.Temperature = t1;
+            viewModel.Channels[1].State.Temperature = t2;
         }
         private void test_init()
         {
             Random rand=new Random();
             if (drawable == null) return;
-            List<CurvePoint> points = new List<CurvePoint>();
-            CurvePoint p;
             DateTime dt= DateTime.Now.AddSeconds(-20);
-            for (int i = 0; i < 20; i++)
-            {
-                    p = new CurvePoint
-                    {
-                        timePos = dt.AddSeconds(i),
-                        tempPos = rand.Next(100) / 100f + 18 + 0.5f * i
-                    };
-                    points.Add(p);
-            }
+
             CurveData d1 = new CurveData
             {
-                curveColor = Colors.Red,
-                Source = points
+                curveColor = Colors.Red
             };
-            viewModel.Curves.Add(d1);
-            dt= DateTime.Now.AddSeconds(-20);
-            points.Clear();
-            for (int i = 0; i < 20; i++) 
+            for (int i = 0; i < 20; i++)
             {
-                p = new CurvePoint
-                {
-                    timePos = dt.AddSeconds(i),
-                    tempPos = 5 + rand.Next(100) / 100f + 18 + 0.5f * i
-                };
-                points.Add(p);
+                d1[dt.AddSeconds(i)] = rand.Next(100) / 100f + 18 + 0.5f * i;
             }
+            viewModel.Curves.Add(d1);
+
             CurveData d2 = new CurveData
             {
-                curveColor = Colors.Blue,
-                Source = points
+                curveColor = Colors.Blue
             };
+            for (int i = 0; i < 20; i++) 
+            {
+                d2[dt.AddSeconds(i)] = 5 + rand.Next(100) / 100f + 18 + 0.5f * i;
+            }
+            
 
             viewModel.Curves.Add(d2);
 
@@ -106,26 +74,28 @@ namespace TemperatureMonitor
             drawable.hscale_level = 0;
             drawable.hoffset = dt;
 
+            dt = dt.AddSeconds(19);
+
             viewModel.Channels.Add(new()
             {
                 Channel = 1,
                 Curve = curveView.Source[0],
-                Name = "Left",
+                Name = "T_Dec1",
                 State = new ChannelState()
                 {
                     Battery = rand.Next(0,100),
-                    Temperature = d1.LastPoint.tempPos,
+                    Temperature = d1[dt],
                 }
             });
             viewModel.Channels.Add(new()
             {
                 Channel = 2,
                 Curve = curveView.Source[1],
-                Name = "R",
+                Name = "T_Dec2",
                 State = new ChannelState()
                 {
                     Battery = rand.Next(0, 100),
-                    Temperature = d2.LastPoint.tempPos
+                    Temperature = d2[dt]
                 }
             });
 
